@@ -10,7 +10,7 @@ fn sbi_call(which: usize, arg0: usize, arg1: usize, arg2: usize) -> usize {
     let mut ret;
     unsafe {
         asm!(
-            "li x16, 0",
+            "li x16, 0",// 将寄存器 x16 的值设置为 0 有何用？删去得到的输出仍然一致
             "ecall",
             inlateout("x10") arg0 => ret,
             in("x11") arg1,
