@@ -9,6 +9,7 @@
     .globl __alltraps
     .globl __restore
     .align 2
+    # all traps go into the `__alltraps` function, the function saves TrapContext on the kernel stack and calls for the function trap_handler to handle each specific trap
 __alltraps:
     csrrw sp, sscratch, sp
     # now sp->kernel stack, sscratch->user stack

@@ -26,7 +26,7 @@ use riscv::register::{
 
 global_asm!(include_str!("trap.S"));
 
-/// Initialize trap handling
+/// Initialize trap handling(`stvec` register points to a single trap handler function that handles all types of traps)
 pub fn init() {
     extern "C" {
         fn __alltraps();

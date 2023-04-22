@@ -21,7 +21,7 @@ __switch:
         SAVE_SN %n
         .set n, n + 1
     .endr
-    # restore ra & s0~s11 of next execution
+    # restore ra & s0~s11 of next execution(normally, ra is the addr of `__restore`, that's the reason why there is no need to keep the instruction `mv sp, a0` in the head of function `__restore`)
     ld ra, 0(a1)
     .set n, 0
     .rept 12
