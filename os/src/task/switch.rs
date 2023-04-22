@@ -13,5 +13,6 @@ global_asm!(include_str!("switch.S"));
 extern "C" {
     /// Switch to the context of `next_task_cx_ptr`, saving the current context
     /// in `current_task_cx_ptr`.
+    /// current_task_cx_ptr is bind with reg a0, next_task_cx_ptr is bind with a1
     pub fn __switch(current_task_cx_ptr: *mut TaskContext, next_task_cx_ptr: *const TaskContext);
 }
