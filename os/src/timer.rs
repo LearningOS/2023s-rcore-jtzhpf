@@ -12,7 +12,7 @@ const MSEC_PER_SEC: usize = 1000;
 #[allow(dead_code)]
 const MICRO_PER_SEC: usize = 1_000_000;
 
-/// Get the current time in ticks
+/// Get the current time in clocks
 pub fn get_time() -> usize {
     time::read()
 }
@@ -31,5 +31,7 @@ pub fn get_time_us() -> usize {
 
 /// Set the next timer interrupt
 pub fn set_next_trigger() {
-    set_timer(get_time() + CLOCK_FREQ / TICKS_PER_SEC);
+    let time = get_time() + CLOCK_FREQ / TICKS_PER_SEC;
+    info!("Next time is {time}clock");
+    set_timer(time);
 }
