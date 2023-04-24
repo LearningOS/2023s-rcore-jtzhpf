@@ -6,7 +6,7 @@
 //! All traps go through `__alltraps`, which is defined in `trap.S`. The
 //! assembly language code does just enough work restore the kernel space
 //! context, ensuring that Rust code safely runs, and transfers control to
-//! [`trap_handler()`].
+//! [`()`].
 //!
 //! It then calls different functionality based on what exactly the exception
 //! was. For example, timer interrupts trigger task preemption, and syscalls go
@@ -15,8 +15,7 @@
 mod context;
 
 use crate::syscall::syscall;
-use crate::task::TASK_MANAGER;
-use crate::task::{exit_current_and_run_next, suspend_current_and_run_next};
+use crate::task::{exit_current_and_run_next, suspend_current_and_run_next, update_syscall_times};
 use crate::timer::set_next_trigger;
 use core::arch::global_asm;
 use riscv::register::{
@@ -52,12 +51,7 @@ pub fn trap_handler(cx: &mut TrapContext) -> &mut TrapContext {
                                // trace!("into {:?}", scause.cause());
     match scause.cause() {
         Trap::Exception(Exception::UserEnvCall) => {
-            let mut inner = TASK_MANAGER.inner.exclusive_access();
-            let current = inner.current_task;
-            let task = &mut inner.tasks[current];
-            task.syscall_times[cx.x[17]] = task.syscall_times[cx.x[17]] + 1;
-            drop(inner);
-
+            update_syscall_times(cx.x[17]);
             // jump to next instruction anyway
             cx.sepc += 4;
             // get system call return value

@@ -26,12 +26,10 @@ pub fn get_time_ms() -> usize {
 /// get current time in microseconds
 #[allow(dead_code)]
 pub fn get_time_us() -> usize {
-    time::read() * MICRO_PER_SEC / CLOCK_FREQ
+    time::read() / (CLOCK_FREQ / MICRO_PER_SEC)
 }
 
 /// Set the next timer interrupt
 pub fn set_next_trigger() {
-    let time = get_time() + CLOCK_FREQ / TICKS_PER_SEC;
-    info!("Next time is {time}clock");
-    set_timer(time);
+    set_timer(get_time() + CLOCK_FREQ / TICKS_PER_SEC);
 }

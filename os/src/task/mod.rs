@@ -82,6 +82,7 @@ impl TaskManager {
         let mut inner = self.inner.exclusive_access();
         let task0 = &mut inner.tasks[0];
         task0.task_status = TaskStatus::Running;
+        task0.time = get_time_ms();
         let next_task_cx_ptr = &task0.task_cx as *const TaskContext;
         drop(inner);
         let mut _unused = TaskContext::zero_init();
@@ -140,6 +141,34 @@ impl TaskManager {
             panic!("All applications completed!");
         }
     }
+
+    /// Get the status of current task
+    fn get_status(&self) -> TaskStatus {
+        let inner = self.inner.exclusive_access();
+        let current = inner.current_task;
+        inner.tasks[current].task_status
+    }
+
+    /// Get the syscall_times of current task
+    fn get_syscall_times(&self) -> [u32; MAX_SYSCALL_NUM] {
+        let inner = self.inner.exclusive_access();
+        let current = inner.current_task;
+        inner.tasks[current].syscall_times
+    }
+
+    /// Get the start_time of current task
+    fn get_start_time(&self) -> usize {
+        let inner = self.inner.exclusive_access();
+        let current = inner.current_task;
+        inner.tasks[current].time
+    }
+
+    /// Update syscall times of current task
+    fn update_syscall_times(&self, syscall_id: usize) {
+        let mut inner = self.inner.exclusive_access();
+        let current = inner.current_task;
+        inner.tasks[current].syscall_times[syscall_id] += 1;
+    }
 }
 
 /// Run the first task in task list.
@@ -173,4 +202,24 @@ pub fn suspend_current_and_run_next() {
 pub fn exit_current_and_run_next() {
     mark_current_exited();
     run_next_task();
+}
+
+/// Get the status of current task
+pub fn get_status() -> TaskStatus {
+    TASK_MANAGER.get_status()
+}
+
+/// Get the syscall_times of current task
+pub fn get_syscall_times() -> [u32; MAX_SYSCALL_NUM] {
+    TASK_MANAGER.get_syscall_times()
+}
+
+/// Get the start_time of current task
+pub fn get_start_time() -> usize {
+    TASK_MANAGER.get_start_time()
+}
+
+/// Update syscall times of current task
+pub fn update_syscall_times(syscall_id: usize) {
+    TASK_MANAGER.update_syscall_times(syscall_id);
 }
