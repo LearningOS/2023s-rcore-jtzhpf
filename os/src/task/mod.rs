@@ -17,7 +17,7 @@ mod task;
 use crate::config::{MAX_APP_NUM, MAX_SYSCALL_NUM};
 use crate::loader::{get_num_app, init_app_cx};
 use crate::sync::UPSafeCell;
-use crate::timer::get_time_ms;
+//use crate::timer::get_time_ms;
 pub use context::TaskContext;
 use lazy_static::*;
 use switch::__switch;
@@ -122,14 +122,15 @@ impl TaskManager {
     fn run_next_task(&self) {
         if let Some(next) = self.find_next_task() {
             let mut inner = self.inner.exclusive_access();
+            //if inner.tasks[next].time == 0 {
+            //    inner.tasks[next].time = get_time_ms();
+            //}
             let current = inner.current_task;
             inner.tasks[next].task_status = TaskStatus::Running;
             inner.current_task = next;
             let current_task_cx_ptr = &mut inner.tasks[current].task_cx as *mut TaskContext;
             let next_task_cx_ptr = &inner.tasks[next].task_cx as *const TaskContext;
-            if inner.tasks[next].time == 0 {
-                inner.tasks[next].time = get_time_ms();
-            }
+
             drop(inner);
             // before this, we should drop local variables that must be dropped manually
             unsafe {

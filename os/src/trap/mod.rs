@@ -53,7 +53,8 @@ pub fn trap_handler(cx: &mut TrapContext) -> &mut TrapContext {
         Trap::Exception(Exception::UserEnvCall) => {
             let mut inner = TASK_MANAGER.inner.exclusive_access();
             let current = inner.current_task;
-            inner.tasks[current].syscall_times[cx.x[17]] += 1;
+            inner.tasks[current].syscall_times[cx.x[17]] =
+                inner.tasks[current].syscall_times[cx.x[17]] + 1;
             drop(inner);
             // jump to next instruction anyway
             cx.sepc += 4;

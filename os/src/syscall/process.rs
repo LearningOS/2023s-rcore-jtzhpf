@@ -59,17 +59,17 @@ pub fn sys_task_info(_ti: *mut TaskInfo) -> isize {
     trace!("kernel: sys_task_info");
     let inner = TASK_MANAGER.inner.exclusive_access();
     let current = inner.current_task;
-    let time = inner.tasks[current].time;
     let status = inner.tasks[current].task_status;
     let syscall_times = inner.tasks[current].syscall_times;
-    drop(inner);
+
     unsafe {
         *_ti = TaskInfo {
             status: status,
             syscall_times: syscall_times,
-            time: (get_time_ms() - time),
+            time: (get_time_ms() - inner.tasks[current].time),
         };
     }
+    drop(inner);
 
     0
 }
