@@ -142,6 +142,7 @@ impl TaskManager {
         }
     }
 
+    /*
     /// Get the status of current task
     fn get_status(&self) -> TaskStatus {
         let inner = self.inner.exclusive_access();
@@ -169,6 +170,7 @@ impl TaskManager {
         let current = inner.current_task;
         inner.tasks[current].syscall_times[syscall_id] += 1;
     }
+    */
 }
 
 /// Run the first task in task list.
@@ -204,6 +206,7 @@ pub fn exit_current_and_run_next() {
     run_next_task();
 }
 
+/*
 /// Get the status of current task
 pub fn get_status() -> TaskStatus {
     TASK_MANAGER.get_status()
@@ -223,3 +226,4 @@ pub fn get_start_time() -> usize {
 pub fn update_syscall_times(syscall_id: usize) {
     TASK_MANAGER.update_syscall_times(syscall_id);
 }
+*/

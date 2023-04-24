@@ -15,7 +15,7 @@
 mod context;
 
 use crate::syscall::syscall;
-use crate::task::{exit_current_and_run_next, suspend_current_and_run_next, update_syscall_times};
+use crate::task::{exit_current_and_run_next, suspend_current_and_run_next, TASK_MANAGER};
 use crate::timer::set_next_trigger;
 use core::arch::global_asm;
 use riscv::register::{
@@ -51,7 +51,10 @@ pub fn trap_handler(cx: &mut TrapContext) -> &mut TrapContext {
                                // trace!("into {:?}", scause.cause());
     match scause.cause() {
         Trap::Exception(Exception::UserEnvCall) => {
-            update_syscall_times(cx.x[17]);
+            let mut inner = TASK_MANAGER.inner.exclusive_access();
+            let current = inner.current_task;
+            inner.tasks[current].syscall_times[cx.x[17]] += 1;
+            drop(inner);
             // jump to next instruction anyway
             cx.sepc += 4;
             // get system call return value
